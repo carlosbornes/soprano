@@ -103,10 +103,21 @@ class _AllCaller:
         if not callable(f):
             raise TypeError("Only functions can be mapped")
 
-        nargs, nargs_def = utils.inspect_args(f)
-        if nargs < 1 + len(args) + len(kwargs):
-            # Function is invalid!
+        nargs, nargs_def, has_var_positional, has_var_keyword = utils.inspect_args(f)
+        
+        if nargs < 1:
             raise ValueError("Invalid function passed to map")
+        
+        if not has_var_positional and not has_var_keyword:
+            if nargs < 1 + len(args) + len(kwargs):
+                raise ValueError("Invalid function passed to map")
+        elif has_var_positional and not has_var_keyword:
+            if nargs < 1 + len(kwargs):
+                raise ValueError("Invalid function passed to map")
+        elif has_var_keyword and not has_var_positional:
+            if nargs < 1 + len(args):
+                raise ValueError("Invalid function passed to map")
+        
         return [f(x, *args, **kwargs) for x in self._all]
 
 

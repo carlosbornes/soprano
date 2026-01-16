@@ -525,15 +525,25 @@ if hasattr(inspect, "signature"):
         args = fsig.parameters
         nargs = len(args)
         nargs_def = len([p for p in args if args[p].default != inspect.Signature.empty])
-        return (nargs, nargs_def)
+        has_var_positional = any(
+            p.kind == inspect.Parameter.VAR_POSITIONAL for p in args.values()
+        )
+        has_var_keyword = any(
+            p.kind == inspect.Parameter.VAR_KEYWORD for p in args.values()
+        )
+        return (nargs, nargs_def, has_var_positional, has_var_keyword)
 
 else:
 
     def inspect_args(f):
         argspec = inspect.getargspec(f)
+        has_var_positional = argspec.varargs is not None
+        has_var_keyword = argspec.keywords is not None
         return (
             len(argspec.args),
             (0 if argspec.defaults is None else len(argspec.defaults)),
+            has_var_positional,
+            has_var_keyword,
         )
 
 
