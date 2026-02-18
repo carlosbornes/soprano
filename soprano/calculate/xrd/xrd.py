@@ -153,7 +153,7 @@ class XRDCalculator:
         # For peak_func there's little we can do to check, mostly it's the
         # user's responsibility.
         if peak_func is not None:
-            nargs, nargs_def = utils.inspect_args(peak_func)
+            nargs, nargs_def, has_var_positional, has_var_keyword = utils.inspect_args(peak_func)
             if nargs < 2:
                 raise ValueError("Invalid peak_func passed to set_peak_func")
             elif (nargs - (2 + nargs_def)) > len(peak_f_args):
